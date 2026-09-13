@@ -789,6 +789,68 @@ export const CATALOGO_PRENDAS: PresetPrenda[] = [
   { id: "sweater-algodon-marron", nombre: "Sweater de algodón marrón", categoria: "sweater", colorHex: "#6F4E37", textura: "algodon", estilo: "clasico", estilosSecundarios: ["casual", "oficina"], ocasion: "laburo", estacion: "entretiempo" },
   { id: "sweater-algodon-gris", nombre: "Sweater de algodón gris", categoria: "sweater", colorHex: "#8C8C8C", textura: "algodon", estilo: "clasico", estilosSecundarios: ["casual", "oficina"], ocasion: "laburo", estacion: "entretiempo" },
 
+  // --- Sweater acanalado (rib knit) -- Consejo, pedido explícito del
+  // usuario con foto real de dos prendas propias: "quiero que actúes como
+  // sastre... para especificar el diseño de dos sweaters acanalados que
+  // tengo en mi placard, uno azul marino y otro beige". Roles consultados:
+  // sastre/ingeniero textil (construcción real y su dibujo, ver el
+  // comentario largo de "acanalado" en Textura, types.ts), modista/curador
+  // de catálogo (dónde entra sin duplicar lo que ya existe).
+  //
+  // IDs propios, no reutilizan sweater-azul-marino/sweater-beige de arriba:
+  // aunque comparten color, son prendas reales DISTINTAS -- esos dos son
+  // punto liso de lana (jersey plano), estos son punto acanalado (rib knit,
+  // relieve tejido en toda la prenda). Mismo criterio que ya separó
+  // pantalon-vestir-negro (lana) de pantalon-gabardina-negro (gabardina):
+  // mismo color, otra construcción real, otra entrada.
+  //
+  // cuello: "redondo" -- la foto de referencia muestra un cuello redondo
+  // (crewneck) de punto acanalado, no el "v" que es el default sin dato de
+  // todo el resto del catálogo de sweaters (ver Cuello en types.ts) -- sin
+  // este campo explícito, el maniquí dibujaría la costura en V incorrecta.
+  //
+  // estacion "entretiempo" (no "invierno" como los sweaters de lana de
+  // arriba): un acanalado real, sea cual sea su fibra, es más liviano y
+  // ajustado al cuerpo que un pullover de punto grueso -- mismo registro de
+  // peso que sweater-algodon-*/sweater-liviano-* de arriba, verificado
+  // contra la foto real (estilizado sin campera encima, clima templado).
+  //
+  // estilo "clasico" principal + secundarios ["oficina", "casual"] -- mismo
+  // criterio que sweater-mostaza/sweater-algodon-*: un acanalado prolijo,
+  // sin estampado, funciona tanto de oficina sin saco (elegante sport, ver
+  // Estilo en types.ts) como de finde con un jean.
+  //
+  // Colores -- mismo azul marino (#1F2A44) y beige (#D8C7A1) que usa el
+  // resto del catálogo, por la consistencia de paleta que ya documenta este
+  // archivo -- no se inventa un tono nuevo solo porque la foto de
+  // referencia (una prenda de otro usuario, no la del usuario) muestre un
+  // camel distinto; el beige real del usuario es el que ya está cargado en
+  // su placard.
+  {
+    id: "sweater-acanalado-azul-marino",
+    nombre: "Sweater acanalado azul marino",
+    categoria: "sweater",
+    colorHex: "#1F2A44",
+    textura: "acanalado",
+    estilo: "clasico",
+    estilosSecundarios: ["oficina", "casual"],
+    ocasion: "laburo",
+    estacion: "entretiempo",
+    cuello: "redondo",
+  },
+  {
+    id: "sweater-acanalado-beige",
+    nombre: "Sweater acanalado beige",
+    categoria: "sweater",
+    colorHex: "#D8C7A1",
+    textura: "acanalado",
+    estilo: "clasico",
+    estilosSecundarios: ["oficina", "casual"],
+    ocasion: "laburo",
+    estacion: "entretiempo",
+    cuello: "redondo",
+  },
+
   // --- Chaleco (sweater sin mangas) -- ronda de completitud del catálogo
   // (ver Manga en types.ts), revisada como sastre y modista. Hueco real y
   // prenda de sastrería con identidad propia, no una variante menor de

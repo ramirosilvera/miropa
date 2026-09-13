@@ -42,6 +42,7 @@ const TEXTURAS: Textura[] = [
   "impermeable",
   "tricot",
   "gabardina",
+  "acanalado",
 ];
 const ESTILOS: Estilo[] = ["casual", "formal", "oficina", "deportivo", "urbano", "clasico"];
 const OCASIONES: Ocasion[] = ["casual", "laburo", "formal"];

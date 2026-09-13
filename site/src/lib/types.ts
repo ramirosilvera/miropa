@@ -27,6 +27,34 @@ export type Textura =
   | "viscosa"
   | "impermeable"
   | "tricot"
+  // "acanalado" -- Consejo, pedido explícito del usuario con foto real de
+  // dos prendas propias (sweater azul marino y beige): "quiero que actúes
+  // como sastre... especificá el diseño de dos sweaters acanalados que
+  // tengo en mi placard". Revisado como sastre e ingeniero textil: hueco
+  // real, mismo criterio que ya separó gabardina/tricot/impermeable de sus
+  // vecinos más cercanos (fibra parecida, construcción real y visualmente
+  // distinta -> textura propia, no una reutilizada).
+  //
+  // Un sweater acanalado (rib knit) NO es lo mismo que un sweater liso de
+  // "lana"/"algodon"/"viscosa" ya cargados arriba: la diferencia es la
+  // CONSTRUCCIÓN del punto, no la fibra. El acanalado alterna columnas de
+  // punto derecho/revés (knit/purl) en todo el CUERPO de la prenda -- nervio
+  // fino y apretado, corrido de arriba a abajo -- mientras que un jersey
+  // liso (el punto de todo sweater "lana"/"algodon"/"viscosa" del catálogo
+  // hasta esta ronda) es una superficie plana sin ese relieve. No confundir
+  // con el puño/cintura acanalados que YA tiene, sin excepción, cualquier
+  // sweater del catálogo (el remate elástico de cualquier prenda de punto,
+  // ver el maniquí) -- acá el canalé cubre la prenda entera, el rasgo real
+  // que define a esta prenda como arquetipo propio (silueta más ajustada al
+  // cuerpo, textura estriada visible a simple vista), no un detalle de
+  // acabado en el borde.
+  //
+  // No fija una fibra específica a propósito -- mismo criterio que
+  // "tricot"/"frisado"/"tejido_grueso" arriba (construcción real, sin
+  // pin de fibra): un acanalado real se teje tanto en lana fina como en
+  // algodón o blends, y la construcción (no la fibra) es lo que define la
+  // prenda y su dibujo.
+  | "acanalado"
   // Pedido explícito del usuario, revisado como sastre e ingeniero textil:
   // "los pantalones de vestir que tengo, negro y marrón, que son de oficina
   // y clásicos, son de gabardina... en el catálogo podés distinguir los
@@ -475,6 +503,12 @@ export function descripcionPrenda(p: Prenda): string {
     // ya existía en el catálogo con ese nombre pero sin ningún dato que lo
     // distinguiera de un sweater cuello redondo/V; ahora lo tiene.
     if (p.cuello === "alto") return "Sweater cuello alto";
+    // acanalado -- ver Textura arriba: antes que el fallback "liviano" de
+    // más abajo (que asume que toda textura != lana es una fibra más
+    // liviana) porque no es cierto acá -- el acanalado es una construcción
+    // de punto distinta, no necesariamente más liviana, y merece su propio
+    // nombre en vez de caer en una descripción que no le corresponde.
+    if (p.textura === "acanalado") return "Sweater acanalado";
     if (p.textura && p.textura !== "lana") return "Sweater liviano";
   }
   if (p.categoria === "campera") {

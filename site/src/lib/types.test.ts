@@ -134,6 +134,15 @@ describe("descripcionPrenda", () => {
     expect(descripcionPrenda(mkPrenda("sweater", { textura: "lana" }))).toBe("Sweater");
   });
 
+  // Consejo, sweaters acanalados azul marino/beige (pedido explícito del
+  // usuario con foto real de dos prendas propias): un acanalado no es lo
+  // mismo que "cualquier fibra que no sea lana" -- necesita su propio
+  // nombre, no el fallback genérico "Sweater liviano" (ver el comentario
+  // de la rama en types.ts).
+  it("sweater acanalado se distingue del fallback genérico 'liviano'", () => {
+    expect(descripcionPrenda(mkPrenda("sweater", { textura: "acanalado" }))).toBe("Sweater acanalado");
+  });
+
   // Ronda de completitud del catálogo (ver Cuello/Manga en types.ts,
   // pedido explícito del usuario: "revisá todas las prendas del
   // catálogo... si se puede completar aún más").

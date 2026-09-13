@@ -142,7 +142,23 @@ export function esRemeraDeportiva(categoria: Categoria, textura: Textura | null 
 // copias, agregar una textura nueva (como "viscosa") corría el riesgo real
 // de actualizar una sola y desincronizar cómo se ve la MISMA prenda en el
 // catálogo/placard contra cómo se ve en "Vestite hoy".
-export const TEXTURA_PATRON: Textura[] = ["denim", "pana", "corderoy", "tejido_grueso", "frisado", "lana", "gabardina", "algodon", "lino", "acolchado"];
+// acanalado -- Consejo, sweaters acanalados azul marino/beige (pedido
+// explícito del usuario con foto real): el canalé (rib knit) tiene relieve
+// tejido de verdad, no una superficie lisa/brillosa como el grupo de abajo
+// -- entra en este grupo, no en TEXTURA_BRILLO.
+export const TEXTURA_PATRON: Textura[] = [
+  "denim",
+  "pana",
+  "corderoy",
+  "tejido_grueso",
+  "frisado",
+  "lana",
+  "gabardina",
+  "algodon",
+  "lino",
+  "acolchado",
+  "acanalado",
+];
 // poliéster (ropa deportiva técnica) suma el mismo brillo diagonal que
 // seda/cuero_liso -- es tela lisa, sin trama visible, con un leve brillo
 // sintético real (más notorio que en algodón/lino), no un patrón tejido.
@@ -229,6 +245,17 @@ export function PatronTextura({ id, textura, tono }: { id: string; textura: Text
             stroke={tono}
             strokeWidth="0.3"
           />
+        </pattern>
+      );
+    case "acanalado":
+      // nervio de canalé -- línea vertical fina y MUY apretada (más angosta
+      // que el canutillo de pana/corderoy de arriba: acá es punto de aguja,
+      // no tela cortada), corrida de forma pareja en toda la prenda -- la
+      // seña real de un sweater acanalado (rib knit) frente al punto liso
+      // de lana/algodón/viscosa del resto del catálogo.
+      return (
+        <pattern id={id} width="1.4" height="2" patternUnits="userSpaceOnUse">
+          <line x1="0.4" y1="0" x2="0.4" y2="2" stroke={tono} strokeWidth="0.35" />
         </pattern>
       );
     case "acolchado":
