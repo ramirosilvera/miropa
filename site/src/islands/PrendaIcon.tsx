@@ -248,14 +248,25 @@ export function PatronTextura({ id, textura, tono }: { id: string; textura: Text
         </pattern>
       );
     case "acanalado":
-      // nervio de canalé -- línea vertical fina y MUY apretada (más angosta
-      // que el canutillo de pana/corderoy de arriba: acá es punto de aguja,
-      // no tela cortada), corrida de forma pareja en toda la prenda -- la
-      // seña real de un sweater acanalado (rib knit) frente al punto liso
-      // de lana/algodón/viscosa del resto del catálogo.
+      // nervio de canalé -- Consejo, corrección real reportada por el
+      // usuario con foto de referencia ("el acanalado de la captura es
+      // distinto al del outfit"): la primera versión (width 1.4/stroke
+      // 0.35) quedó MÁS apretada que el canutillo de pana de acá arriba
+      // (width 2.6/stroke 0.9) -- exactamente al revés de lo que dice el
+      // comentario original. Un acanalado real de sweater (rib knit
+      // grueso, como el de la foto: nervios anchos y bien separados,
+      // corridos parejo de cuello a puño) es MÁS ancho y prominente que un
+      // canutillo de pana, no más fino -- la pana es tela cortada de trama
+      // apretada; el canalé es punto de aguja con relieve marcado y
+      // valles anchos entre nervio y nervio. Recalibrado por comparación
+      // visual directa (Chromium headless, mismo método que ya usaron
+      // rondas anteriores): 8-9 nervios visibles cruzando el torso, cada
+      // uno como línea distinguible con un valle liso claro alrededor --
+      // no una trama fina que se lee como relleno sólido a tamaño de
+      // ícono.
       return (
-        <pattern id={id} width="1.4" height="2" patternUnits="userSpaceOnUse">
-          <line x1="0.4" y1="0" x2="0.4" y2="2" stroke={tono} strokeWidth="0.35" />
+        <pattern id={id} width="4" height="2" patternUnits="userSpaceOnUse">
+          <line x1="2" y1="0" x2="2" y2="2" stroke={tono} strokeWidth="0.6" />
         </pattern>
       );
     case "acolchado":
