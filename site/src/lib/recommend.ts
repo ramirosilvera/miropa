@@ -393,6 +393,13 @@ const FAMILIA_TEXTURA: Record<Textura, "liso" | "texturado"> = {
   frisado: "texturado",
   denim: "texturado",
   acolchado: "texturado",
+  // acanalado (rib knit) -- Consejo, sweaters acanalados azul marino/beige:
+  // el compilador exigió este caso apenas se agregó el valor al enum (ver
+  // el comentario largo de arriba, el motivo real de tipar este mapa contra
+  // Record<Textura, ...>). "texturado", no "liso": el nervio de canalé es
+  // relieve tejido real y bien visible, igual que la lana o el tejido
+  // grueso -- lo opuesto a la superficie lisa de seda/viscosa/tricot.
+  acanalado: "texturado",
 };
 
 /**

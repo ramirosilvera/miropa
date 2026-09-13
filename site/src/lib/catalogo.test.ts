@@ -401,6 +401,44 @@ describe("catálogo -- chaleco (sweater sin mangas, ver Manga en types.ts)", () 
   });
 });
 
+// Consejo, pedido explícito del usuario con foto real de dos prendas
+// propias: "sweaters acanalados... uno azul marino y otro beige".
+describe("catálogo -- sweater acanalado (ver 'acanalado' en Textura, types.ts)", () => {
+  const acanalados = CATALOGO_PRENDAS.filter((p) => p.categoria === "sweater" && p.textura === "acanalado");
+
+  it("existen los dos colores pedidos (azul marino y beige)", () => {
+    expect(acanalados.length).toBe(2);
+    expect(acanalados.map((p) => p.colorHex)).toContain("#1F2A44");
+    expect(acanalados.map((p) => p.colorHex)).toContain("#D8C7A1");
+  });
+
+  // No reusan los IDs de sweater-azul-marino/sweater-beige (lana, punto
+  // liso) -- son prendas reales distintas, mismo criterio que ya separó
+  // pantalon-vestir-* (lana) de pantalon-gabardina-* (mismo color, otra
+  // tela real).
+  it("tienen IDs propios, distintos de los sweaters de lana lisa del mismo color", () => {
+    const ids = acanalados.map((p) => p.id);
+    expect(ids).not.toContain("sweater-azul-marino");
+    expect(ids).not.toContain("sweater-beige");
+  });
+
+  it("son cuello redondo (crewneck), no el V por defecto del resto del catálogo de sweaters", () => {
+    expect(acanalados.every((p) => p.cuello === "redondo")).toBe(true);
+  });
+
+  it("son de entretiempo, como el resto de los sweaters livianos (no de invierno como los de lana)", () => {
+    expect(acanalados.every((p) => p.estacion === "entretiempo")).toBe(true);
+  });
+
+  it("funcionan en oficina (elegante sport) y casual, mismo registro que sweater-mostaza/sweater-algodon-*", () => {
+    for (const p of acanalados) {
+      expect(p.estilo).toBe("clasico");
+      expect(p.estilosSecundarios ?? []).toContain("oficina");
+      expect(p.estilosSecundarios ?? []).toContain("casual");
+    }
+  });
+});
+
 describe("catálogo -- sweater cuello alto (ver Cuello en types.ts)", () => {
   it("sweater-cuello-alto-negro declara cuello 'alto' explícitamente", () => {
     const p = CATALOGO_PRENDAS.find((p) => p.id === "sweater-cuello-alto-negro");
