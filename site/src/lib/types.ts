@@ -39,8 +39,11 @@ export type Textura =
   // "lana"/"algodon"/"viscosa" ya cargados arriba: la diferencia es la
   // CONSTRUCCIÓN del punto, no la fibra. El acanalado alterna columnas de
   // punto derecho/revés (knit/purl) en todo el CUERPO de la prenda -- nervio
-  // fino y apretado, corrido de arriba a abajo -- mientras que un jersey
-  // liso (el punto de todo sweater "lana"/"algodon"/"viscosa" del catálogo
+  // ANCHO y bien marcado (más prominente y espaciado que un canutillo de
+  // pana, no más fino -- corregido en la ronda siguiente, ver el dibujo en
+  // PrendaIcon.tsx: la primera versión describía esto al revés), corrido de
+  // arriba a abajo -- mientras que un jersey liso (el punto de todo sweater
+  // "lana"/"algodon"/"viscosa" del catálogo
   // hasta esta ronda) es una superficie plana sin ese relieve. No confundir
   // con el puño/cintura acanalados que YA tiene, sin excepción, cualquier
   // sweater del catálogo (el remate elástico de cualquier prenda de punto,
