@@ -2161,7 +2161,11 @@ describe("armarOutfitsSugeridos", () => {
     it("bermuda no deportivo + sweater (mismo color, combinan perfecto) -> NUNCA se arma ese outfit", () => {
       const bermuda = mkPrenda("bermuda", "#D8C7A1", 40, 25, 75); // beige
       const sweater = mkPrenda("sweater", "#D8C7A1", 40, 25, 75); // mismo beige exacto
-      const outfits = armarOutfitsSugeridos([bermuda, sweater]);
+      // clima="verano" explícito -- si no, con clima="entretiempo" (el
+      // default hoy) da 0 igual, pero por el motivo equivocado (el bermuda
+      // ni siquiera ancla ahí, ver la regla 3 de armarOutfitsSugeridos):
+      // este test quiere probar la regla de abrigo, no la de clima.
+      const outfits = armarOutfitsSugeridos([bermuda, sweater], "verano");
       expect(outfits).toHaveLength(0);
     });
 
@@ -2169,7 +2173,11 @@ describe("armarOutfitsSugeridos", () => {
       const bermuda = mkPrenda("bermuda", "#D8C7A1", 40, 25, 75);
       const sweater = mkPrenda("sweater", "#D8C7A1", 40, 25, 75);
       const remera = mkPrenda("remera", "#D8C7A1", 40, 25, 75);
-      const outfits = armarOutfitsSugeridos([bermuda, sweater, remera]);
+      // clima="verano" explícito -- ronda siguiente: un bermuda ya no ancla
+      // en clima="entretiempo" (ver la regla 3 de armarOutfitsSugeridos),
+      // y esto no es lo que este test quiere probar (bermuda nunca combina
+      // con sweater, sea cual sea el clima en que sí ancla).
+      const outfits = armarOutfitsSugeridos([bermuda, sweater, remera], "verano");
       expect(outfits).toHaveLength(1);
       expect(outfits[0].prendas.map((p) => p.categoria).sort()).toEqual(["bermuda", "remera"].sort());
     });
@@ -2367,21 +2375,35 @@ describe("armarOutfitsSugeridos", () => {
     });
 
     // Hallazgo real al generalizar la regla de invierno a entretiempo
-    // (verificado por ejecución -- 31 tests existentes rompieron antes de
-    // este ajuste): un bermuda/short "de calle" SÍ ancla con clima=
-    // "entretiempo" (a diferencia de invierno, donde queda excluido antes
-    // de llegar acá) -- y sigue sin combinar con NINGÚN abrigo, ni siquiera
-    // uno de entretiempo real, porque las piernas al aire nunca lo admiten
-    // (ver excluirAbrigo). Sin el `&& !excluirAbrigo` de climaConAbrigoExigido,
-    // esto quedaba sin ningún torso posible siempre (candidatosTorso ya sin
-    // abrigo por excluirAbrigo, y encima exigiéndolo).
-    it("clima='entretiempo' -- un bermuda sigue armando con remera (piernas al aire, nunca exige abrigo aunque el clima sí lo exija para un pantalón)", () => {
+    // Pedido explícito del usuario, ronda siguiente: "las bermudas no
+    // deberían figurar en un clima de entretiempo". Revisado como sastre/
+    // asesor de imagen: tenía razón -- entretiempo ya implica temperatura
+    // más baja que pide pantalón largo, un bermuda "de calle" queda
+    // reservado para verano real (ver la regla 3 del comentario largo de
+    // armarOutfitsSugeridos). Reemplaza el test anterior, que afirmaba
+    // justo lo contrario (bermuda sí anclaba en entretiempo) -- ese
+    // comportamiento era el que se pidió corregir acá.
+    it("clima='entretiempo' -- un bermuda 'de calle' NO ancla ningún outfit (reservado para verano real)", () => {
       const bermuda = mkPrenda("bermuda", "#1A1A1A", 0, 0, 10);
       const remera = mkPrenda("remera", "#1A1A1A", 0, 0, 10);
-      const outfits = armarOutfitsSugeridos([bermuda, remera], "entretiempo");
+      expect(armarOutfitsSugeridos([bermuda, remera], "entretiempo")).toHaveLength(0);
+    });
+
+    it("clima='verano' -- un bermuda SÍ ancla con remera (piernas al aire, nunca exige abrigo aunque el clima sí lo exija para un pantalón)", () => {
+      const bermuda = mkPrenda("bermuda", "#1A1A1A", 0, 0, 10);
+      const remera = mkPrenda("remera", "#1A1A1A", 0, 0, 10);
+      const outfits = armarOutfitsSugeridos([bermuda, remera], "verano");
       expect(outfits).toHaveLength(1);
       expect(outfits[0].prendas.map((p) => p.categoria).sort()).toEqual(["bermuda", "remera"].sort());
     });
+
+    // short_deportivo NO se ve afectado por la regla nueva (ver regla 3 del
+    // comentario largo de armarOutfitsSugeridos): un short de entrenamiento
+    // con buzo/hoodie (athleisure real) sigue siendo válido en entretiempo,
+    // a diferencia del bermuda de calle de arriba -- son dos registros
+    // distintos, no la misma regla. Ver el describe de athleisure más
+    // abajo ("short deportivo + buzo, los dos tageados deportivo -> SÍ se
+    // arma") para la prueba completa de este caso -- no se duplica acá.
 
     // No hardcodea un resultado esperado (length concreta): desde que el
     // clima exige/excluye abrigo de verdad (ver esAbrigoDeClima), ese
@@ -2406,13 +2428,20 @@ describe("armarOutfitsSugeridos", () => {
   // camisa de vestir de oficina (estilo clasico, ocasion LABURO) combinaba
   // con un bermuda sin ninguna fricción real. Ver esDeOficina en
   // recommend.ts.
+  //
+  // clima="verano" explícito en todo este describe -- ronda siguiente: un
+  // bermuda ya no ancla en clima="entretiempo" (ver la regla 3 del
+  // comentario de armarOutfitsSugeridos), y `estacionActual()` (el default
+  // sin este argumento) depende de la fecha real en que corre el test. Sin
+  // esto, estos tests pasaban o fallaban según el mes del año en vez de
+  // testear lo que de verdad les importa (la regla de ocasion/oficina).
   describe("ocasion -- ninguna prenda 'de oficina' (laburo/formal) combina con un bermuda/short", () => {
     it("bermuda + camisa ocasion=laburo (mismo estilo, mismo color) -> NUNCA arma ese outfit", () => {
       const bermuda = mkPrenda("bermuda", "#1A1A1A", 0, 0, 10);
       const camisaOficina = mkPrenda("camisa", "#1A1A1A", 0, 0, 10);
       camisaOficina.estilo = "clasico";
       camisaOficina.ocasion = "laburo";
-      expect(armarOutfitsSugeridos([bermuda, camisaOficina])).toHaveLength(0);
+      expect(armarOutfitsSugeridos([bermuda, camisaOficina], "verano")).toHaveLength(0);
     });
 
     it("bermuda + camisa ocasion=casual (resort/fin de semana) -> SÍ combina, mismo estilo que antes", () => {
@@ -2420,7 +2449,7 @@ describe("armarOutfitsSugeridos", () => {
       const camisaCasual = mkPrenda("camisa", "#1A1A1A", 0, 0, 10);
       camisaCasual.estilo = "urbano";
       camisaCasual.ocasion = "casual";
-      const outfits = armarOutfitsSugeridos([bermuda, camisaCasual]);
+      const outfits = armarOutfitsSugeridos([bermuda, camisaCasual], "verano");
       expect(outfits).toHaveLength(1);
       expect(outfits[0].prendas.map((p) => p.categoria).sort()).toEqual(["bermuda", "camisa"].sort());
     });
@@ -2430,7 +2459,7 @@ describe("armarOutfitsSugeridos", () => {
       const remera = mkPrenda("remera", "#1A1A1A", 0, 0, 10);
       const zapatoVestir = mkPrenda("calzado", "#1A1A1A", 0, 0, 10);
       zapatoVestir.ocasion = "laburo";
-      const outfits = armarOutfitsSugeridos([bermuda, remera, zapatoVestir]);
+      const outfits = armarOutfitsSugeridos([bermuda, remera, zapatoVestir], "verano");
       expect(outfits).toHaveLength(1);
       expect(outfits[0].prendas.map((p) => p.categoria)).not.toContain("calzado");
     });
@@ -2440,7 +2469,7 @@ describe("armarOutfitsSugeridos", () => {
       const remera = mkPrenda("remera", "#1A1A1A", 0, 0, 10);
       const accesorioOficina = mkPrenda("accesorio", "#1A1A1A", 0, 0, 10);
       accesorioOficina.ocasion = "laburo";
-      const outfits = armarOutfitsSugeridos([bermuda, remera, accesorioOficina]);
+      const outfits = armarOutfitsSugeridos([bermuda, remera, accesorioOficina], "verano");
       expect(outfits).toHaveLength(1);
       expect(outfits[0].prendas.map((p) => p.categoria)).not.toContain("accesorio");
     });
@@ -2662,7 +2691,10 @@ describe("armarOutfitsSugeridos", () => {
       const bermuda = mkPrenda("bermuda", "#1A1A1A", 0, 0, 10);
       const saco = mkPrenda("saco", "#1A1A1A", 0, 0, 10); // ocasion: null por defecto en mkPrenda
       const remera = mkPrenda("remera", "#1A1A1A", 0, 0, 10);
-      const outfits = armarOutfitsSugeridos([bermuda, saco, remera]);
+      // clima="verano" explícito -- un bermuda ya no ancla en
+      // clima="entretiempo" (ver la regla 3 de armarOutfitsSugeridos), y
+      // esto no es lo que este test quiere probar (la exclusión de saco).
+      const outfits = armarOutfitsSugeridos([bermuda, saco, remera], "verano");
       expect(outfits).toHaveLength(1);
       expect(outfits[0].prendas.map((p) => p.categoria)).not.toContain("saco");
     });
@@ -4755,7 +4787,11 @@ describe("comboParaExcelencia", () => {
     const placard = ["bermuda-beige", "remera-negra", "zapatillas-negras", "cinturon-negro"].map((id) =>
       presetAPrendaSintetica(catalogoPorId[id]),
     );
-    const base = armarOutfitsSugeridos(placard, "entretiempo")
+    // clima="verano" -- ronda siguiente: un bermuda ya no ancla en
+    // clima="entretiempo" (ver la regla 3 de armarOutfitsSugeridos), y este
+    // test usa "bermuda-beige" como ancla real, no lo que quiere probar
+    // (el reemplazo de categoría de comboParaExcelencia).
+    const base = armarOutfitsSugeridos(placard, "verano")
       .filter((s) => outfitSirveParaEstilo(s.prendas, "clasico"))
       .sort((a, b) => b.puntaje - a.puntaje)[0];
     expect(base.puntaje).toBe(6); // un defecto real, una prenda para cambiar (antes 7, por el promedio)

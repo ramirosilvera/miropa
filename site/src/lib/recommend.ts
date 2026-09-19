@@ -2141,16 +2141,32 @@ function esDeOficina(p: Prenda): boolean {
  *     ancla NO es deportiva.
  *  2. clima="verano": ningún abrigo combina con NADA, ni siquiera con un
  *     pantalón largo -- con calor de verdad no se usa buzo/sweater/
- *     campera. clima="invierno": un bermuda/short directamente no ancla
- *     ningún outfit -- con frío de verdad no se usan las piernas al aire,
- *     sea cual sea el torso. clima="entretiempo" no agrega ninguna
- *     restricción extra sobre la regla 1. */
+ *     campera. clima="invierno": ni bermuda ni short ancla ningún outfit
+ *     -- con frío de verdad no se usan las piernas al aire, sea cual sea
+ *     el torso.
+ *  3. clima="entretiempo" -- pedido explícito del usuario ("las bermudas
+ *     no deberían figurar en un clima de entretiempo"), revisado como
+ *     sastre/asesor de imagen: tenía razón, un bermuda "de calle" (no
+ *     deportivo) queda reservado para verano real -- entretiempo ya
+ *     implica temperatura más baja que pide pantalón largo, no piernas al
+ *     aire. NO se extiende a `short_deportivo`: un short de entrenamiento
+ *     con buzo/hoodie (athleisure real, ver el caso `esAnclaDeportiva` más
+ *     abajo, ya probado) sigue siendo una combinación real en entretiempo
+ *     -- a alguien no le importa la temperatura moderada para entrenar
+ *     con las piernas al aire, es un registro distinto del bermuda de
+ *     calle. */
 export function armarOutfitsSugeridos(placard: Prenda[], clima: Estacion = estacionActual()): OutfitSugerido[] {
   const pantalones = placard
     .filter((p) => CATEGORIAS_PIERNAS.includes(p.categoria))
-    // con frío real, un bermuda/short no ancla ningún outfit -- ver el
-    // comentario largo de arriba, regla 2.
-    .filter((p) => clima !== "invierno" || !CATEGORIAS_PIERNAS_VERANIEGAS.includes(p.categoria));
+    // con frío real, ni bermuda ni short ancla ningún outfit -- ver el
+    // comentario largo de arriba, regla 2. Bermuda "de calle" (no
+    // short_deportivo): tampoco en entretiempo -- ver regla 3.
+    .filter((p) => {
+      if (!CATEGORIAS_PIERNAS_VERANIEGAS.includes(p.categoria)) return true;
+      if (clima === "invierno") return false;
+      if (p.categoria === "bermuda" && clima === "entretiempo") return false;
+      return true;
+    });
   const resultados: OutfitSugerido[] = [];
   const vistos = new Set<string>();
 
