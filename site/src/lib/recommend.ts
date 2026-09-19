@@ -992,11 +992,29 @@ function chocaRegistroDeportivo(a: Prenda, b: Prenda): boolean {
   return (esDeportivo(a) && esDeVestir(b)) || (esDeportivo(b) && esDeVestir(a));
 }
 
+// Consejo, pedido explícito del usuario: "revisá las prendas asignadas a
+// mis estilos... en urbano tengo prendas urbanas y otras no, termina
+// siendo un estilo híbrido". Auditoría contra el placard real (roles:
+// asesor de imagen, sastre, terminología de moda): el DATO de cada prenda
+// no está mal cargado (el propio catálogo, ver catalogo.ts, ya define
+// jean/jogger como "urbano" por el corte/tela, no por decoración) -- lo
+// que fallaba era que las PALABRAS "Clásico" y "Urbano" prometen algo más
+// angosto de lo que la app en realidad modela:
+// - "clasico" mezcla bermudas de colores suaves con sweaters de oficina y
+//   un chino -- el registro real es el que la moda llama "smart casual"
+//   (prolijo, ni deportivo ni de oficina estricta), no "clásico" en el
+//   sentido sastrero (neutro, atemporal).
+// - "urbano" es, por diseño del catálogo, streetwear real (denim, puffer,
+//   zapatilla de 3 rayas) -- pero "Urbano" en español no comunica esa
+//   estética con la misma precisión que el término real de la industria.
+// Solo se tocan estas dos etiquetas VISIBLES -- las claves del enum
+// (Estilo en types.ts) y todo el resto de la lógica de combinación siguen
+// intactas, así que ninguna prenda cambia de estilo.
 export const ESTILO_LABEL: Record<Estilo, string> = {
   formal: "Formal",
-  clasico: "Clásico",
+  clasico: "Smart Casual",
   oficina: "Oficina",
-  urbano: "Urbano",
+  urbano: "Streetwear",
   casual: "Casual",
   deportivo: "Deportivo",
 };

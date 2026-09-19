@@ -1432,7 +1432,7 @@ describe("registroOutfit / advertenciasDeRegistro", () => {
     const bermudaClasico = mkPrenda("bermuda", "#D8C7A1", 40, 30, 70);
     bermudaClasico.estilo = "clasico";
     const camisa = mkPrenda("camisa", "#FAFAF7", 0, 0, 98);
-    expect(registroOutfit([bermudaClasico, camisa])).toBe("Clásico");
+    expect(registroOutfit([bermudaClasico, camisa])).toBe("Smart Casual");
   });
 
   it("un short deportivo también ancla el registro cuando no hay pantalón ni bermuda", () => {
@@ -3646,7 +3646,7 @@ describe("sugerenciaDeAbrigoInvierno", () => {
     const r = sugerenciaDeAbrigoInvierno("clasico", [pantalon, sweaterSinEstacion], catalogoAbrigos);
     expect(r).not.toBeNull();
     expect(r!.sugerida.id).toBe("sweater-clasico-invierno");
-    expect(r!.mensaje).toContain("Clásico");
+    expect(r!.mensaje).toContain("Smart Casual");
   });
 
   it("un saco cuenta siempre como abrigo de 'formal', aunque no tenga `estacion` cargada -- null, nada que comprar", () => {
@@ -3730,7 +3730,7 @@ describe("sugerenciaDeAbrigoEntretiempo", () => {
     const r = sugerenciaDeAbrigoEntretiempo("clasico", [pantalon, sweaterInvierno], catalogoAbrigos);
     expect(r).not.toBeNull();
     expect(r!.sugerida.id).toBe("sweater-clasico-entretiempo");
-    expect(r!.mensaje).toContain("Clásico");
+    expect(r!.mensaje).toContain("Smart Casual");
   });
 
   it("un saco cuenta siempre como abrigo de 'formal', aunque no tenga `estacion` cargada -- null, nada que comprar", () => {
