@@ -626,6 +626,20 @@ function TorsoCuerpo({ prenda }: { prenda: Prenda }) {
               <circle cx="60" cy="70" r="1.4" fill={detalleHsl(prenda.color_h, prenda.color_s, prenda.color_l)} />
             </>
           )}
+          {prenda.categoria === "remera" && prenda.cuello === "v" && (
+            // Consejo, estilo playero (pedido explícito del usuario con
+            // foto real: "las camisetas tienen cuello en V"), reportado
+            // como bug real: las 3 remeras playero cargaban cuello="v" en
+            // el dato, pero esta categoría solo chequeaba "polo" -- CUALQUIER
+            // otro valor (incluido "v") se quedaba con el escote redondo
+            // por defecto de la silueta compartida (ver el comentario largo
+            // de conEstampado más arriba sobre la silueta ÚNICA de torso).
+            // Mismo mecanismo que ya usa "sweater" más abajo para su propio
+            // cuello "v" (línea sin relleno trazando el escote, no una
+            // silueta nueva) -- V real, más abierto y en punta que el
+            // escote redondo curvo de la remera lisa por defecto.
+            <path d="M46 42 L60 55 L74 42" fill="none" stroke={stroke} {...strokeProps} strokeWidth={3} />
+          )}
           {prenda.categoria === "sweater" &&
             (() => {
               // Cuello (redondo/v/alto) -- ver Cuello en types.ts, ronda
@@ -929,6 +943,20 @@ const HEM_PIERNAS: Partial<Record<Categoria, number>> = {
 
 function PiernasCuerpo({ prenda }: { prenda: Prenda }) {
   const hem = HEM_PIERNAS[prenda.categoria];
+  // con estampado -- Consejo, estilo playero (pedido explícito del usuario
+  // con foto real: "el short blanco tiene rayas azules y el short rosa
+  // rayas blancas"), reportado como bug real: a diferencia de TorsoCuerpo
+  // (que sí chequea conEstampado para remera/camisa), PiernasCuerpo nunca
+  // tuvo este mecanismo -- pantalón/bermuda/short_deportivo se dibujaban
+  // siempre con `fill` plano, sin importar patron/color2. Inofensivo
+  // mientras ningún pantalón/bermuda del catálogo tuviera estampado
+  // cargado, hasta que los 2 shorts de baño a rayas lo expusieron (mismo
+  // bug ya corregido para bermuda en PrendaIcon.tsx). `horizontal={false}`
+  // -- un pinstripe vertical corriendo por la pierna es la orientación
+  // real de un short de baño a rayas (la foto de referencia), a diferencia
+  // de la raya horizontal de una remera marinera.
+  const estampadoId = `estampado-${prenda.id}`;
+  const conEstampado = (prenda.patron === "rayas" || prenda.patron === "cuadros") && !!prenda.color2_hex;
   // pantalon (hem === undefined): la silueta completa de siempre, con la
   // rodilla/pantorrilla curvándose hacia afuera cerca del tobillo. bermuda/
   // short_deportivo: una columna recta desde la cadera hasta el hem (en ese
@@ -950,6 +978,17 @@ function PiernasCuerpo({ prenda }: { prenda: Prenda }) {
       prenda={prenda}
       hijos={(fill, stroke, patron) => (
         <>
+          {conEstampado && prenda.color2_hex && (prenda.patron === "rayas" || prenda.patron === "cuadros") && (
+            <defs>
+              <PatronEstampado
+                id={estampadoId}
+                patron={prenda.patron}
+                colorBase={prenda.color_hex}
+                color2={prenda.color2_hex}
+                horizontal={false}
+              />
+            </defs>
+          )}
           {/* calce (ajustado/regular/holgado) -- ver escalaSilueta arriba
               del archivo y el mismo mecanismo en TorsoCuerpo. Envuelve las
               dos piernas Y la cinturilla como una sola pieza de tela. */}
@@ -967,8 +1006,20 @@ function PiernasCuerpo({ prenda }: { prenda: Prenda }) {
               el tobillo. Antes las piernas bajaban casi en columna recta
               (apenas 0.5u de diferencia entre cadera y tobillo), una
               postura de firmes, no relajada. */}
-          <Forma d={izquierda} fill={fill} stroke={stroke} patron={patron} sugerida={esSugerida(prenda)} />
-          <Forma d={derecha} fill={fill} stroke={stroke} patron={patron} sugerida={esSugerida(prenda)} />
+          <Forma
+            d={izquierda}
+            fill={conEstampado ? `url(#${estampadoId})` : fill}
+            stroke={stroke}
+            patron={conEstampado ? undefined : patron}
+            sugerida={esSugerida(prenda)}
+          />
+          <Forma
+            d={derecha}
+            fill={conEstampado ? `url(#${estampadoId})` : fill}
+            stroke={stroke}
+            patron={conEstampado ? undefined : patron}
+            sugerida={esSugerida(prenda)}
+          />
           {/* jean/vestir/jogger -- ver esJean/esPantalonDeVestir/esJogger en
               PrendaIcon.tsx, EXACTAMENTE el mismo criterio que ya usa el
               ícono chico (mismas funciones importadas, no duplicadas) --

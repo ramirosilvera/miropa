@@ -670,10 +670,23 @@ export function PrendaShape({
             // lo único que cambia es un escote más cerrado (menos abierto
             // que el crew redondo, dejando lugar al cuello camisero) y la
             // decoración de acá abajo (cuello + placket + botones).
+            //
+            // cuello "v" -- Consejo, estilo playero (pedido explícito del
+            // usuario con foto real: "las camisetas tienen cuello en V"),
+            // reportado como bug real: las 3 remeras playero ya cargaban
+            // cuello="v" en el dato, pero esta rama solo distinguía "polo"
+            // del crew redondo por defecto -- CUALQUIER otro valor de
+            // Cuello (incluido "v") caía en el mismo escote redondo de
+            // siempre, así que el dato quedaba sin efecto visual. Pico
+            // real hasta y=20 (más profundo que el escote redondo, que
+            // solo baja a y=17 con curva) -- la seña que distingue un
+            // cuello V real de un crew, verificado contra las 3 fotos.
             d={
               cuello === "polo"
                 ? "M24 8 L32 12 L40 8 L54 16 L47 26 L42 22 L42 56 L22 56 L22 22 L17 26 L10 16 Z"
-                : "M22 8 Q32 17 42 8 L54 16 L47 26 L42 22 L42 56 L22 56 L22 22 L17 26 L10 16 Z"
+                : cuello === "v"
+                  ? "M22 8 L32 20 L42 8 L54 16 L47 26 L42 22 L42 56 L22 56 L22 22 L17 26 L10 16 Z"
+                  : "M22 8 Q32 17 42 8 L54 16 L47 26 L42 22 L42 56 L22 56 L22 22 L17 26 L10 16 Z"
             }
             fill={conEstampado ? estampadoUrl! : color}
             stroke={stroke}
@@ -921,9 +934,27 @@ export function PrendaShape({
       // de jean aplica acá (ver esJean, que incluye "bermuda" a propósito)
       // -- un bermuda de vestir/jogger no existe como arquetipo real en
       // este catálogo, así que no hace falta esa decoración.
+      //
+      // con estampado -- Consejo, estilo playero (pedido explícito del
+      // usuario con foto real: "el short blanco tiene rayas azules y el
+      // short rosa rayas blancas"), reportado como bug real: `bermuda`
+      // nunca chequeaba `conEstampado`/`estampadoUrl` (a diferencia de
+      // remera/camisa, que sí lo hacen, ver su comentario largo más
+      // arriba) -- el `patron` que recibía FormaConTextura acá es el de
+      // TEXTURA (fiber, variable local que shadowea el prop de arriba,
+      // ver conPatron/conBrillo), no el estampado de rayas/cuadros. Con
+      // patron="rayas" + color2 cargados, los 2 shorts de baño rayados se
+      // dibujaban lisos de un solo color -- el mismo hallazgo de "gap
+      // silencioso" que ya motivó el fix de remera/camisa, nunca
+      // extendido a bermuda hasta ahora.
       forma = (
         <>
-          <FormaConTextura d="M18 6 H46 L44 44 H34 L32 24 L30 44 H20 Z" fill={color} stroke={stroke} patron={patron} />
+          <FormaConTextura
+            d="M18 6 H46 L44 44 H34 L32 24 L30 44 H20 Z"
+            fill={conEstampado ? estampadoUrl! : color}
+            stroke={stroke}
+            patron={conEstampado ? undefined : patron}
+          />
           {esJean(categoria, textura) && (
             <>
               <line x1="43" y1="8" x2="41.5" y2="42" stroke={tonoDetalle} strokeWidth={0.8} />
