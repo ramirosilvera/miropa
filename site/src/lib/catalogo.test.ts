@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CATALOGO_CON_HSL, CATALOGO_PRENDAS, presetAPrendaSintetica } from "./catalogo";
-import { armarOutfitsSugeridos } from "./recommend";
+import { armarOutfitsSugeridos, puntuarOutfit } from "./recommend";
 import type { Categoria, CorteCalzado, Estilo } from "./types";
 
 // buzo/sweater/campera -- las tres categorías de abrigo que SÍ se tagean
@@ -528,14 +528,20 @@ describe("catálogo -- campera de gabardina (oficina)", () => {
 // 7 prendas propias: 3 remeras cuello V texturizadas, 3 shorts de baño
 // estampados, 1 ojota azul marino). Ver "playero" en Estilo (types.ts)
 // para la justificación completa del rol de asesor de imagen/sastre.
-describe("catálogo -- estilo playero (3 remeras + 3 shorts de baño + 1 ojota)", () => {
+//
+// Octava prenda (ojota blanca) sumada en una ronda posterior -- ver el
+// comentario largo en catalogo.ts junto a "ojota-blanca": no fue un
+// pedido de variedad porque sí, sino la corrección de un reporte real
+// ("no muestra las remeras blanca y beige"), auditado hasta la causa con
+// puntuarOutfit antes de tocar el catálogo.
+describe("catálogo -- estilo playero (3 remeras + 3 shorts de baño + 2 ojotas)", () => {
   const playero = CATALOGO_PRENDAS.filter((p) => p.estilo === "playero");
 
-  it("existen las 7 prendas", () => {
-    expect(playero.length).toBe(7);
+  it("existen las 8 prendas", () => {
+    expect(playero.length).toBe(8);
   });
 
-  it("las 7 son de estacion verano -- ninguna otra categoría de este estilo tiene sentido real fuera de verano", () => {
+  it("las 8 son de estacion verano -- ninguna otra categoría de este estilo tiene sentido real fuera de verano", () => {
     expect(playero.every((p) => p.estacion === "verano")).toBe(true);
   });
 
@@ -571,11 +577,36 @@ describe("catálogo -- estilo playero (3 remeras + 3 shorts de baño + 1 ojota)"
     expect(armarOutfitsSugeridos([short, remera], "verano").length).toBeGreaterThan(0);
   });
 
-  it("hay una ojota azul marino, corte_calzado 'ojota' (distinto de 'sandalia')", () => {
-    const ojota = playero.find((p) => p.categoria === "calzado");
-    expect(ojota).toBeDefined();
-    expect(ojota?.corteCalzado).toBe("ojota");
-    expect(ojota?.colorHex).toBe("#1F2A44");
+  it("hay una ojota azul marino y una ojota blanca, ambas corte_calzado 'ojota' (distinto de 'sandalia')", () => {
+    const ojotas = playero.filter((p) => p.categoria === "calzado");
+    expect(ojotas).toHaveLength(2);
+    expect(ojotas.every((p) => p.corteCalzado === "ojota")).toBe(true);
+    const hex = ojotas.map((p) => p.colorHex);
+    expect(hex).toContain("#1F2A44");
+    expect(hex).toContain("#F5F5F5");
+  });
+
+  // Regresión directa del reporte real: antes de sumar la ojota blanca,
+  // remera blanca/beige + cualquier short de baño + la única ojota (azul
+  // marino) quedaba en 9/10 (acentoDeColorAislado: el azul de la ojota no
+  // tenía eco en ningún otro lado del outfit) -- por debajo del piso de
+  // 10/10 que exige "Vestite hoy" (esExcelente), así que esas remeras
+  // nunca aparecían ahí aunque el resto del catálogo/placard estuviera
+  // bien. Con la ojota blanca en el placard, el motor tiene una opción de
+  // calzado NEUTRA (esNeutro), que por construcción nunca puede quedar
+  // como "acento aislado" -- confirma que las 9 combinaciones reales
+  // (3 remeras x 3 shorts) con esa ojota llegan a 10/10.
+  it("remera blanca y beige SÍ llegan a 10/10 (puntaje excelente) con la ojota blanca, cualquier short", () => {
+    const find = (id: string) => presetAPrendaSintetica(CATALOGO_CON_HSL.find((p) => p.id === id)!);
+    const ojotaBlanca = find("ojota-blanca");
+    const shorts = ["short-bano-blanco-rayas-azules", "short-bano-verde", "short-bano-rosa-rayas-blancas"];
+    for (const remeraId of ["remera-playero-blanca", "remera-playero-beige"]) {
+      const remera = find(remeraId);
+      for (const shortId of shorts) {
+        const short = find(shortId);
+        expect(puntuarOutfit([remera, short, ojotaBlanca], "playero").puntaje).toBe(10);
+      }
+    }
   });
 
   it("ninguna prenda playero requiere cuello ni es saco -- nunca se cuela un traje en un look de playa", () => {

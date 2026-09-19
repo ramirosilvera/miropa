@@ -1672,6 +1672,34 @@ export const CATALOGO_PRENDAS: PresetPrenda[] = [
     estacion: "verano",
     corteCalzado: "ojota",
   },
+  // Ojota blanca -- Consejo, ronda de "no muestra las remeras blanca y
+  // beige": auditado con puntuarOutfit contra el catálogo real, la causa
+  // no era un bug de datos ni de render (esos ya estaban bien) sino
+  // acentoDeColorAislado (recommend.ts): con una sola ojota en el placard
+  // (la azul marino), esa era la única prenda no-neutra de calzado del
+  // outfit, y en remera blanca/beige quedaba sin "eco" de su tono en
+  // ningún otro lado -- outfit "impecable" pero tope 9/10, por debajo del
+  // piso de 10/10 que exige "Vestite hoy" (esExcelente, pedido explícito
+  // del usuario en una ronda anterior). No es una preferencia de paleta:
+  // esNeutro(s=0, l=96) da true para blanco, así que acentoDeColorAislado
+  // ni siquiera la considera candidata a "acento" -- una ojota blanca no
+  // puede quedar aislada, combine con lo que combine. Confirmado por
+  // ejecución: puntuarOutfit da 10/10 en las 9 combinaciones reales
+  // (3 remeras x 3 shorts) con esta ojota, remera blanca y beige
+  // incluidas. Mismo criterio de sastre que ya motivó la ojota azul
+  // marino original -- el blanco es, además, el color de ojota más común
+  // en la playa, no una prenda inventada para el puntaje.
+  {
+    id: "ojota-blanca",
+    nombre: "Ojota blanca",
+    categoria: "calzado",
+    colorHex: "#F5F5F5",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+    corteCalzado: "ojota",
+  },
 ];
 
 /** Deriva h/s/l de cada preset una sola vez (no en cada render). hsl2 solo
