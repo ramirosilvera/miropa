@@ -952,10 +952,13 @@ export function PrendaShape({
       // tramo inferior del resto de los cortes, y=41 a 50 contra 44 a 50)
       // -- el dedo queda literalmente afuera del dibujo, no tapado por un
       // trazo que sugiera piel.
+      // ojota -- misma silueta baja y abierta que la sandalia (ver
+      // CorteCalzado en types.ts): ninguna de las dos tiene capellada
+      // cerrada, así que comparten el mismo contorno de suela chata.
       const d =
         corteCalzado === "botin"
           ? "M8 44 Q8 36 18 34 L34 30 Q40 26 44 26 L44 10 L58 10 L58 44 Q58 50 52 50 L12 50 Q8 50 8 44 Z"
-          : corteCalzado === "sandalia"
+          : corteCalzado === "sandalia" || corteCalzado === "ojota"
             ? "M8 46 Q8 42 12 41 L54 41 Q58 43 58 46 Q58 50 52 50 L12 50 Q8 50 8 46 Z"
             : "M8 44 Q8 36 18 34 L34 30 Q40 24 48 26 L52 34 Q58 36 58 44 Q58 50 52 50 L12 50 Q8 50 8 44 Z";
       const base = <FormaConTextura d={d} fill={color} stroke={stroke} patron={patron} />;
@@ -1064,6 +1067,16 @@ export function PrendaShape({
               <path d="M38 41 Q46 20 54 41 Q46 32 38 41 Z" fill={color} stroke={stroke} strokeWidth={0.6} />
             </>
           );
+          break;
+        case "ojota":
+          // Consejo, pedido explícito del usuario con foto real ("ojotas
+          // tipo sandalias azul marino"). UNA sola tira fina en "V" (thong)
+          // naciendo entre el primer y segundo dedo, SIN tira de talón --
+          // ver CorteCalzado en types.ts para el porqué es un corte
+          // distinto de "sandalia" de arriba (dos tiras anchas cruzando
+          // todo el empeine). Color base (`color`), mismo criterio que
+          // sandalia: la tira es la misma pieza que la suela.
+          decoracion = <path d="M20 41 L26 24 L32 41" fill="none" stroke={color} strokeWidth={1.4} strokeLinecap="round" />;
           break;
         case "zapatilla_urbana":
         default:

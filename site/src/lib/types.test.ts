@@ -115,6 +115,18 @@ describe("descripcionPrenda", () => {
     );
   });
 
+  // Consejo, estilo playero (pedido explícito del usuario con foto real de
+  // 3 shorts de baño): mismo criterio que el Jogger de arriba -- la fibra
+  // (poliéster) sola no distingue un short de baño de uno de entrenamiento,
+  // lo que los distingue es el registro real (estilo="playero").
+  it("bermuda de poliéster con estilo='playero' es Short de baño, no Bermuda deportiva", () => {
+    expect(descripcionPrenda(mkPrenda("bermuda", { textura: "poliester", estilo: "playero" }))).toBe("Short de baño");
+  });
+
+  it("remera de lino es Remera de lino, distinta del genérico", () => {
+    expect(descripcionPrenda(mkPrenda("remera", { textura: "lino" }))).toBe("Remera de lino");
+  });
+
   it("buzo distingue con/sin capucha", () => {
     expect(descripcionPrenda(mkPrenda("buzo", { con_capucha: true }))).toBe("Buzo con capucha");
     expect(descripcionPrenda(mkPrenda("buzo", { con_capucha: false }))).toBe("Buzo sin capucha");
@@ -270,6 +282,10 @@ describe("descripcionPrenda", () => {
     // CorteCalzado en types.ts).
     expect(descripcionPrenda(mkPrenda("calzado", { corte_calzado: "botin" }))).toBe("Botines");
     expect(descripcionPrenda(mkPrenda("calzado", { corte_calzado: "sandalia" }))).toBe("Sandalias");
+    // ojota -- Consejo, estilo playero (pedido explícito del usuario con
+    // foto real: "ojotas tipo sandalias azul marino"). Corte distinto de
+    // "sandalia" (sin tira de talón), no debe caer en su mismo nombre.
+    expect(descripcionPrenda(mkPrenda("calzado", { corte_calzado: "ojota" }))).toBe("Ojotas");
   });
 });
 

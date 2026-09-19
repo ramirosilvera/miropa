@@ -44,7 +44,7 @@ const TEXTURAS: Textura[] = [
   "gabardina",
   "acanalado",
 ];
-const ESTILOS: Estilo[] = ["casual", "formal", "oficina", "deportivo", "urbano", "clasico"];
+const ESTILOS: Estilo[] = ["casual", "formal", "oficina", "deportivo", "urbano", "clasico", "playero"];
 const OCASIONES: Ocasion[] = ["casual", "laburo", "formal"];
 const ESTACIONES: Estacion[] = ["verano", "invierno", "entretiempo"];
 const CALCES: Calce[] = ["ajustado", "regular", "holgado"];
@@ -449,6 +449,7 @@ export default function PrendaForm() {
                     <option value="zapatilla_lona">Zapatilla de lona</option>
                     <option value="botin">Botín / bota (caña sobre el tobillo)</option>
                     <option value="sandalia">Sandalia (sin capellada, de verano)</option>
+                    <option value="ojota">Ojota (tira única entre los dedos, sin talón)</option>
                   </select>
                 </label>
                 <label style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>

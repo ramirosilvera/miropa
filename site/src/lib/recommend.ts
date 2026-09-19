@@ -652,6 +652,15 @@ const FORMALIDAD_ESTILO: Partial<Record<NonNullable<Prenda["estilo"]>, number>> 
   urbano: 1,
   casual: 1,
   deportivo: 0,
+  // "playero" -- Consejo, pedido explícito del usuario: mismo rango que
+  // deportivo (0, el piso de la escala). Un short de baño y una remera de
+  // playa no son "vestidos" en ningún sentido, igual que la ropa de
+  // entrenamiento -- ninguno de los dos es más o menos formal que el otro,
+  // los dos ocupan el escalón más relajado que existe. Definido explícito
+  // (no se deja `undefined`) para que las comparaciones de
+  // TECHO_FORMALIDAD_POR_CATEGORIA/rangoPedido en outfitSirveParaEstilo no
+  // se salteen en silencio por falta de dato.
+  playero: 0,
 };
 
 /** Vocabulario exclusivo del traje -- pedido explícito del usuario, rol:
@@ -1017,6 +1026,7 @@ export const ESTILO_LABEL: Record<Estilo, string> = {
   urbano: "Streetwear",
   casual: "Casual",
   deportivo: "Deportivo",
+  playero: "Playero",
 };
 
 /** Pedido explícito del usuario: que la app diga a qué registro (laboral,
@@ -3480,6 +3490,7 @@ const CORTE_CALZADO_LABEL: Record<CorteCalzado, string> = {
   zapatilla_lona: "una zapatilla de lona",
   botin: "un botín",
   sandalia: "una sandalia",
+  ojota: "una ojota",
 };
 
 /** Auditoría de Consejo (roles: asesor de imagen/estilista + sastre), pedido

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CATALOGO_PRENDAS } from "./catalogo";
+import { CATALOGO_CON_HSL, CATALOGO_PRENDAS, presetAPrendaSintetica } from "./catalogo";
+import { armarOutfitsSugeridos } from "./recommend";
 import type { Categoria, CorteCalzado, Estilo } from "./types";
 
 // buzo/sweater/campera -- las tres categorías de abrigo que SÍ se tagean
@@ -359,8 +360,21 @@ describe("catálogo -- calzado con corte real por registro (pedido explícito de
   // Sin estacion a propósito: un botín se usa de otoño a primavera, no solo
   // con frío extremo -- tagearlo "invierno" lo sacaría de todos los outfits
   // de entretiempo, que es justo cuando más se usa.
-  it("ningún calzado fuerza `estacion` -- tampoco el botín", () => {
-    expect(calzado.every((p) => !p.estacion)).toBe(true);
+  //
+  // Única excepción real (Consejo, estilo playero): la ojota SÍ lleva
+  // `estacion: "verano"` a propósito -- a diferencia del botín, acá no hay
+  // ambigüedad real de uso (nadie usa una ojota de goma en invierno) y el
+  // dato es inofensivo para el motor: `estacion` en calzado nunca EXCLUYE
+  // nada (esAbrigoDeClima solo mira CATEGORIAS_ABRIGO, ver recommend.ts),
+  // solo afecta el ORDEN cuando hay que desempatar por color (ver
+  // ordenarPorEstacion) -- documenta la intención real de la prenda sin
+  // arriesgar sacarla de ningún outfit.
+  it("ningún calzado fuerza `estacion`, salvo la ojota (estilo playero, verano real)", () => {
+    const sinOjota = calzado.filter((p) => p.corteCalzado !== "ojota");
+    expect(sinOjota.every((p) => !p.estacion)).toBe(true);
+    const ojotas = calzado.filter((p) => p.corteCalzado === "ojota");
+    expect(ojotas.length).toBeGreaterThan(0);
+    expect(ojotas.every((p) => p.estacion === "verano")).toBe(true);
   });
 
   // Sandalias -- ronda de completitud del catálogo (ver CorteCalzado en
@@ -507,5 +521,64 @@ describe("catálogo -- campera de gabardina (oficina)", () => {
     expect(marron?.colorHex).toBe("#6F4E37");
     const pantalonMarron = CATALOGO_PRENDAS.find((p) => p.id === "pantalon-gabardina-marron");
     expect(marron?.colorHex).toBe(pantalonMarron?.colorHex);
+  });
+});
+
+// Consejo, nuevo estilo (pedido explícito del usuario con fotos reales de
+// 7 prendas propias: 3 remeras cuello V texturizadas, 3 shorts de baño
+// estampados, 1 ojota azul marino). Ver "playero" en Estilo (types.ts)
+// para la justificación completa del rol de asesor de imagen/sastre.
+describe("catálogo -- estilo playero (3 remeras + 3 shorts de baño + 1 ojota)", () => {
+  const playero = CATALOGO_PRENDAS.filter((p) => p.estilo === "playero");
+
+  it("existen las 7 prendas", () => {
+    expect(playero.length).toBe(7);
+  });
+
+  it("las 7 son de estacion verano -- ninguna otra categoría de este estilo tiene sentido real fuera de verano", () => {
+    expect(playero.every((p) => p.estacion === "verano")).toBe(true);
+  });
+
+  it("las 3 remeras son de lino, cuello V, colores blanco/beige/azul marino", () => {
+    const remeras = playero.filter((p) => p.categoria === "remera");
+    expect(remeras.length).toBe(3);
+    expect(remeras.every((p) => p.textura === "lino")).toBe(true);
+    expect(remeras.every((p) => p.cuello === "v")).toBe(true);
+    const hex = remeras.map((p) => p.colorHex);
+    expect(hex).toContain("#F5F5F5");
+    expect(hex).toContain("#D8C7A1");
+    expect(hex).toContain("#1F2A44");
+  });
+
+  it("los 3 shorts de baño son bermuda de poliéster -- 2 a rayas (con colorHex2) y 1 liso", () => {
+    const shorts = playero.filter((p) => p.categoria === "bermuda");
+    expect(shorts.length).toBe(3);
+    expect(shorts.every((p) => p.textura === "poliester")).toBe(true);
+    const aRayas = shorts.filter((p) => p.patron === "rayas");
+    expect(aRayas.length).toBe(2);
+    expect(aRayas.every((p) => p.colorHex2)).toBe(true);
+  });
+
+  // Integración con la regla de clima ya existente (pedido explícito del
+  // usuario, ronda anterior: "las bermudas no deberían figurar en un
+  // clima de entretiempo") -- confirma que un short de baño real del
+  // catálogo se comporta igual que cualquier otra bermuda de calle, sin
+  // necesitar ningún código nuevo en armarOutfitsSugeridos.
+  it("un short de baño no ancla ningún outfit en clima='entretiempo', solo en clima='verano'", () => {
+    const short = presetAPrendaSintetica(CATALOGO_CON_HSL.find((p) => p.id === "short-bano-verde")!);
+    const remera = presetAPrendaSintetica(CATALOGO_CON_HSL.find((p) => p.id === "remera-playero-blanca")!);
+    expect(armarOutfitsSugeridos([short, remera], "entretiempo")).toHaveLength(0);
+    expect(armarOutfitsSugeridos([short, remera], "verano").length).toBeGreaterThan(0);
+  });
+
+  it("hay una ojota azul marino, corte_calzado 'ojota' (distinto de 'sandalia')", () => {
+    const ojota = playero.find((p) => p.categoria === "calzado");
+    expect(ojota).toBeDefined();
+    expect(ojota?.corteCalzado).toBe("ojota");
+    expect(ojota?.colorHex).toBe("#1F2A44");
+  });
+
+  it("ninguna prenda playero requiere cuello ni es saco -- nunca se cuela un traje en un look de playa", () => {
+    expect(playero.every((p) => p.categoria !== "saco" && !p.requiereCuello)).toBe(true);
   });
 });

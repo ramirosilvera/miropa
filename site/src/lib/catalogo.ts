@@ -1532,6 +1532,146 @@ export const CATALOGO_PRENDAS: PresetPrenda[] = [
   // versátiles, mismos hex de siempre.
   { id: "gorra-negra", nombre: "Gorra negra", categoria: "accesorio", colorHex: "#1A1A1A", textura: "algodon", estilo: "urbano", estilosSecundarios: ["deportivo", "casual"], ocasion: "casual", posicionAccesorio: "cabeza" },
   { id: "gorra-azul-marino", nombre: "Gorra azul marino", categoria: "accesorio", colorHex: "#1F2A44", textura: "algodon", estilo: "urbano", estilosSecundarios: ["deportivo", "casual"], ocasion: "casual", posicionAccesorio: "cabeza" },
+
+  // --- Playero -- Consejo, nuevo estilo (pedido explícito del usuario con
+  // fotos reales de 7 prendas propias: 3 remeras cuello V texturizadas, 3
+  // shorts de baño estampados, 1 ojota). Roles consultados: asesor de
+  // imagen/sastre (auditoría de la ronda anterior ya había concluido que
+  // el placard no tenía volumen real de resort-wear como para justificar
+  // un estilo propio -- ahora sí lo tiene, ver "playero" en Estilo,
+  // types.ts). `estacion: "verano"` en las 7 -- a diferencia del resto del
+  // catálogo (donde estacion se deja vacía por ambigua), acá no hay
+  // ambigüedad real: un short de baño y una ojota no se usan en
+  // entretiempo, y con la regla de clima ya existente (pedido explícito
+  // del usuario, ronda anterior: "las bermudas no deberían figurar en un
+  // clima de entretiempo") una bermuda sin `estacion` igual ya queda
+  // fuera de entretiempo -- pero cargarla explícita documenta la intención
+  // real de la prenda, no solo se apoya en el efecto colateral de otra
+  // regla.
+  //
+  // Remeras cuello V texturizadas -- textura "lino" (ver descripcionPrenda
+  // en types.ts, rama nueva "Remera de lino"): la tela texturizada/de
+  // trama visible de las 3 fotos reales es la misma seña que ya usa
+  // camisa-lino-*/pantalon-lino-* para "tela de verano transpirable", no
+  // el jersey liso de algodón del resto de las remeras. cuello "v" en las
+  // 3 -- las fotos muestran un escote profundo sin abotonadura, no el
+  // cuello redondo por defecto. Blanco y azul marino -- mismos hex de
+  // siempre. Beige -- el usuario describió esta prenda como "beige"
+  // (aunque el local la vendía como "Albaricoque"); se usa el mismo beige
+  // ya establecido en el resto del catálogo (#D8C7A1) en vez de inventar
+  // un tercer tono de beige/tostado, mismo criterio de consistencia de
+  // paleta que documenta el resto del archivo.
+  {
+    id: "remera-playero-blanca",
+    nombre: "Remera de lino blanca (cuello V)",
+    categoria: "remera",
+    colorHex: "#F5F5F5",
+    textura: "lino",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+    cuello: "v",
+  },
+  {
+    id: "remera-playero-beige",
+    nombre: "Remera de lino beige (cuello V)",
+    categoria: "remera",
+    colorHex: "#D8C7A1",
+    textura: "lino",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+    cuello: "v",
+  },
+  {
+    id: "remera-playero-azul-marino",
+    nombre: "Remera de lino azul marino (cuello V)",
+    categoria: "remera",
+    colorHex: "#1F2A44",
+    textura: "lino",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+    cuello: "v",
+  },
+
+  // Shorts de baño -- categoria "bermuda" (no existe una categoría propia
+  // de "swimwear" en el modelo, y conceptualmente comparten silueta/uso
+  // con el resto de CATEGORIAS_PIERNAS_VERANIEGAS, ver recommend.ts).
+  // textura "poliester" (tela técnica de secado rápido, forro de malla --
+  // mismo criterio real que ya separa el jogger deportivo del casual, ver
+  // descripcionPrenda) + `estilo: "playero"` es lo que los distingue de
+  // "Bermuda deportiva" (rama nueva agregada en esta misma ronda). Patron
+  // "rayas" en las dos primeras (colorHex2 real de cada foto); la verde no
+  // lleva colorHex2 -- el estampado geométrico de la foto no es un patrón
+  // tejido representable con el enum Patron actual (liso/rayas/cuadros/
+  // bloques, ver types.ts), así que se carga liso con el color dominante
+  // real en vez de inventar un patrón que no es ninguno de los cuatro.
+  {
+    id: "short-bano-blanco-rayas-azules",
+    nombre: "Short de baño blanco a rayas azules",
+    categoria: "bermuda",
+    colorHex: "#F5F5F5",
+    colorHex2: "#3366CC",
+    patron: "rayas",
+    textura: "poliester",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+  },
+  // verde -- tono real sampleado de la foto (sage/oliva claro), distinto
+  // del verde bosque ya usado en pantalon-pana-verde/pantalon-deportivo-
+  // verde-oscuro -- mismo criterio que ya documentó buzo-colorblock-greige:
+  // un color puntual de una prenda real con foto no se fuerza a la paleta
+  // existente si el tono real es genuinamente otro.
+  {
+    id: "short-bano-verde",
+    nombre: "Short de baño verde estampado",
+    categoria: "bermuda",
+    colorHex: "#7C9473",
+    textura: "poliester",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+  },
+  // rosa a rayas blancas -- mismo rosa que remera-rosa (#E4A6B4),
+  // consistencia de paleta cross-categoría.
+  {
+    id: "short-bano-rosa-rayas-blancas",
+    nombre: "Short de baño rosa a rayas blancas",
+    categoria: "bermuda",
+    colorHex: "#E4A6B4",
+    colorHex2: "#F5F5F5",
+    patron: "rayas",
+    textura: "poliester",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+  },
+
+  // Ojota azul marino -- nuevo corte_calzado "ojota" (ver CorteCalzado en
+  // types.ts): tira única en "V" sin talón, distinta de la sandalia de
+  // cuero ya cargada más arriba. textura sin cargar a propósito -- mismo
+  // criterio que zapatilla_urbana/running (suela de goma/EVA, "la prenda
+  // real no es de tela", ver el comentario grande al principio del
+  // archivo).
+  {
+    id: "ojota-azul-marino",
+    nombre: "Ojota azul marino",
+    categoria: "calzado",
+    colorHex: "#1F2A44",
+    estilo: "playero",
+    estilosSecundarios: ["casual"],
+    ocasion: "casual",
+    estacion: "verano",
+    corteCalzado: "ojota",
+  },
 ];
 
 /** Deriva h/s/l de cada preset una sola vez (no en cada render). hsl2 solo
