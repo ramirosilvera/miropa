@@ -37,7 +37,7 @@ import PrendaIcon from "./PrendaIcon";
  *  renombrar esos dos estilos a "Smart Casual"/"Streetwear" (Consejo,
  *  auditoría de nombres vs. contenido real del placard) para que una
  *  futura renombrada solo tenga que tocar ESTILO_LABEL una vez. */
-const SECCIONES: Estilo[] = ["formal", "oficina", "clasico", "urbano", "casual", "deportivo"];
+const SECCIONES: Estilo[] = ["formal", "oficina", "clasico", "urbano", "casual", "deportivo", "playero"];
 
 /** Buscador + filtro por estilo + catálogo agrupado en secciones -- un solo
  *  componente compartido por PrendaForm.tsx ("+Prenda") y Probar.tsx

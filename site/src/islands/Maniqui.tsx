@@ -1062,6 +1062,23 @@ function DecoracionCalzado({
 }) {
   const mx = (x: number) => (mirror ? 120 - x : x);
   switch (corte) {
+    case "ojota":
+      // Consejo, pedido explícito del usuario con foto real ("ojotas tipo
+      // sandalias azul marino"): UNA sola tira fina en "V" (thong) entre el
+      // primer y segundo dedo, sin tira de talón -- ver CorteCalzado en
+      // types.ts para el porqué es un corte distinto de "sandalia" (dos
+      // tiras anchas cruzando todo el empeine, más abajo). Lleva el color
+      // base (`fill`), mismo criterio que sandalia: la tira es la misma
+      // pieza que la suela, no otro material.
+      return (
+        <path
+          d={`M${mx(46)} 231 L${mx(42)} 219 L${mx(38)} 231`}
+          fill="none"
+          stroke={fill ?? tono}
+          strokeWidth={1.1}
+          strokeLinecap="round"
+        />
+      );
     case "sandalia":
       // Dos tiras (del empeine + del tobillo) cruzando la suela chata --
       // ver CorteCalzado en types.ts, ronda de completitud del catálogo.
@@ -1173,7 +1190,9 @@ function PiesCuerpo({ prenda }: { prenda: Prenda }) {
   // vestir, con cordones más discretos en la vida real pero cordones al
   // fin). sandalia -- ronda de completitud del catálogo: tampoco lleva
   // cordones, no hay empeine cerrado donde ponerlos.
-  const conCordones = prenda.corte_calzado !== "mocasin" && prenda.corte_calzado !== "sandalia";
+  // ojota -- mismo motivo que sandalia: no hay empeine cerrado donde poner
+  // cordones (ver CorteCalzado en types.ts).
+  const conCordones = prenda.corte_calzado !== "mocasin" && prenda.corte_calzado !== "sandalia" && prenda.corte_calzado !== "ojota";
   // El botín es el único corte que cambia la SILUETA y no solo la
   // decoración (ver CorteCalzado en types.ts): la caña arranca donde los
   // demás cortes ya terminaron (y=223) y sube por encima del tobillo. Se
@@ -1187,7 +1206,9 @@ function PiesCuerpo({ prenda }: { prenda: Prenda }) {
   // de la variante compartida botín/cerrado de estas mismas variables) --
   // el pie se ve bajo y abierto, con las tiras de DecoracionCalzado
   // cruzando por encima.
-  const esSandalia = prenda.corte_calzado === "sandalia";
+  // ojota -- misma silueta baja y abierta que la sandalia (ver
+  // CorteCalzado en types.ts): ninguna de las dos tiene capellada cerrada.
+  const esSandalia = prenda.corte_calzado === "sandalia" || prenda.corte_calzado === "ojota";
   const yCana = esBotin ? 212 : 223;
   // la caña además AFINA hacia arriba (arranca en 41-51 y se abre a 36-56
   // recién a la altura del pie): un botín real es más angosto en el tobillo

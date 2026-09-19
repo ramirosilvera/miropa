@@ -84,7 +84,30 @@ export type Textura =
 // outfitSirveParaEstilo, recommend.ts), "oficina" la excluye a propósito,
 // junto con cualquier prenda que requiera cuello (corbata/moño -- ver
 // requiere_cuello más abajo).
-export type Estilo = "casual" | "formal" | "deportivo" | "urbano" | "clasico" | "oficina";
+//
+// "playero" -- Consejo, pedido explícito del usuario con fotos reales de
+// 7 prendas propias (3 remeras cuello V texturizadas, 3 shorts de baño
+// estampados, 1 ojota): "quiero que crees el estilo playero". Roles
+// consultados: asesor de imagen/sastre (auditoría previa de la ronda
+// anterior ya había concluido que el placard no tenía volumen real de
+// resort-wear como para justificar una categoría propia -- ahora sí lo
+// tiene). Registro real y distinto de "casual": un short de baño (tela
+// técnica, forro de malla, se moja) y una remera de playa NO son la misma
+// prenda que un jean o un buzo de calle, aunque las dos sean informales --
+// mismo criterio que ya separó "deportivo" de "casual" pese a que las dos
+// comparten el escalón más bajo de formalidad (ver FORMALIDAD_ESTILO en
+// recommend.ts, donde "playero" entra al mismo rango 0 que "deportivo": es
+// el registro más relajado que existe, ninguno de los dos es "vestido").
+// No se confunde con "deportivo": un short de baño con una remera de playa
+// no es un look de entrenamiento, y por eso "playero" no hereda ninguna de
+// las excepciones de `esAnclaDeportiva` (armarOutfitsSugeridos) -- sigue
+// sin combinar con ningún abrigo real, igual que cualquier bermuda de
+// calle (ver CATEGORIAS_PIERNAS_VERANIEGAS). Por la misma regla de clima ya
+// existente (pedido explícito del usuario, ronda anterior: "las bermudas
+// no deberían figurar en un clima de entretiempo"), un short de baño
+// categoria="bermuda" solo va a sugerirse con clima="verano" -- correcto
+// para esta prenda en particular, sin necesitar ningún código nuevo.
+export type Estilo = "casual" | "formal" | "deportivo" | "urbano" | "clasico" | "oficina" | "playero";
 export type Ocasion = "casual" | "laburo" | "formal";
 export type Estacion = "verano" | "invierno" | "entretiempo";
 
@@ -229,8 +252,28 @@ export type Manga = "corta" | "larga" | "sin_mangas";
  *    misma ronda de completitud del catálogo: los cinco cortes anteriores
  *    (incluido el botín, que es justo lo opuesto) cubrían frío/entretiempo
  *    pero no el calzado real de un verano de calle -- un guardarropa real
- *    no usa zapatilla cerrada con bermuda en pleno enero. */
-export type CorteCalzado = "zapatilla_urbana" | "zapatilla_running" | "zapato_vestir" | "mocasin" | "zapatilla_cuero" | "zapatilla_lona" | "botin" | "sandalia";
+ *    no usa zapatilla cerrada con bermuda en pleno enero.
+ *  - "ojota" (playero): Consejo, pedido explícito del usuario con foto
+ *    real ("unas ojotas tipo sandalias azul marino"). Revisado como
+ *    sastre/modista: NO es lo mismo que "sandalia" de arriba, aunque las
+ *    dos sean calzado abierto de verano -- una sandalia real tiene tira de
+ *    talón (se sujeta al pie), una ojota/chancla es sola tira en "Y" entre
+ *    el primer y segundo dedo, SIN nada en el talón (por eso no se puede
+ *    correr ni caminar rápido con ellas, la seña real que las distingue a
+ *    simple vista). Silueta genuinamente distinta -- mismo criterio que ya
+ *    separó botín/sandalia del resto (cambia la forma, no solo el color) --
+ *    y registro más informal todavía que la sandalia de cuero: una ojota
+ *    es la prenda de arena/pileta por excelencia, nunca de calle. */
+export type CorteCalzado =
+  | "zapatilla_urbana"
+  | "zapatilla_running"
+  | "zapato_vestir"
+  | "mocasin"
+  | "zapatilla_cuero"
+  | "zapatilla_lona"
+  | "botin"
+  | "sandalia"
+  | "ojota";
 
 /** Calce/silueta real de la prenda -- auditoría de sastrería (Consejo,
  *  ronda de auditoría del motor): tercer eje de un conjunto, después del
@@ -452,6 +495,13 @@ export function descripcionPrenda(p: Prenda): string {
       // técnica). "Bermuda deportiva" no cambia -- la bermuda no tiene el
       // mismo dato de corte jogger (calce) modelado hoy.
       if (esPantalon && p.calce === "holgado" && p.estilo !== "deportivo") return "Jogger";
+      // short de baño -- Consejo, estilo playero (pedido explícito del
+      // usuario con foto real de 3 shorts de baño estampados). Mismo
+      // hallazgo que el jogger de arriba: la FIBRA (poliéster) no
+      // distingue un short de entrenamiento de uno de baño -- lo que los
+      // distingue es el registro real (estilo="playero"), antes de caer
+      // en el genérico "Bermuda deportiva".
+      if (!esPantalon && p.estilo === "playero") return "Short de baño";
       return esPantalon ? "Pantalón deportivo" : "Bermuda deportiva";
     }
     if (p.textura === "algodon") {
@@ -491,6 +541,12 @@ export function descripcionPrenda(p: Prenda): string {
   // poliéster del placard real del usuario se mostraba "Remera" a secas,
   // indistinguible de una remera de algodón común.
   if (p.categoria === "remera" && p.textura === "poliester") return "Remera deportiva";
+  // de lino -- Consejo, estilo playero (pedido explícito del usuario con
+  // foto real de 3 remeras de playa cuello V, textura texturizada tipo
+  // lino). Mismo hallazgo que "Remera deportiva" de arriba: sin esta
+  // rama, las tres caían en el genérico "Remera", indistinguibles de
+  // cualquier remera lisa de algodón.
+  if (p.categoria === "remera" && p.textura === "lino") return "Remera de lino";
   // a rayas (Breton stripe) -- mismo hallazgo que la de arriba: el
   // catálogo ya tiene "remera-rayas-marina" con este nombre específico,
   // pero sin esta rama caía en el genérico "Remera" como cualquier otra.
@@ -575,6 +631,10 @@ export function descripcionPrenda(p: Prenda): string {
     // sandalia -- ver CorteCalzado en types.ts, ronda de completitud del
     // catálogo (el calzado de verano que faltaba, contraparte del botín).
     if (p.corte_calzado === "sandalia") return "Sandalias";
+    // ojota -- ver CorteCalzado en types.ts, estilo playero (pedido
+    // explícito del usuario con foto real). Antes que el fallback, no
+    // caiga en "Sandalias": es un corte distinto, sin tira de talón.
+    if (p.corte_calzado === "ojota") return "Ojotas";
     return "Zapatillas urbanas";
   }
   // gorro/gorra -- ver posicion_accesorio en types.ts, ronda de
