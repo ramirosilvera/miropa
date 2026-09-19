@@ -585,7 +585,7 @@ describe("coincideBusqueda", () => {
   it("matchea también por un estilo secundario, no solo el principal", () => {
     const p = mkPrenda("sweater", "#C3922E", 40, 62, 47, "clasico", ["casual"]);
     expect(coincideBusqueda(p, "casual")).toBe(true);
-    expect(coincideBusqueda(p, "clásico")).toBe(true);
+    expect(coincideBusqueda(p, "smart casual")).toBe(true);
   });
 
   it("matchea por estación, y no matchea si la prenda no tiene estación cargada", () => {

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { CATALOGO_PRENDAS, type PresetPrenda } from "../lib/catalogo";
+import { ESTILO_LABEL } from "../lib/recommend";
 import type { Estilo } from "../lib/types";
 import PrendaIcon from "./PrendaIcon";
 
@@ -27,15 +28,16 @@ import PrendaIcon from "./PrendaIcon";
  *  Se agrega la sección propia "Oficina" (mismo lugar que esos otros
  *  archivos: justo después de "formal") y se revierte el título de
  *  "Formal" a secas -- ya no hace falta la aclaración "(oficina)" ahora
- *  que oficina tiene su propia sección real. */
-const SECCIONES: { estilo: Estilo; titulo: string }[] = [
-  { estilo: "formal", titulo: "Formal" },
-  { estilo: "oficina", titulo: "Oficina" },
-  { estilo: "clasico", titulo: "Clásico" },
-  { estilo: "urbano", titulo: "Urbano" },
-  { estilo: "casual", titulo: "Casual" },
-  { estilo: "deportivo", titulo: "Deportivo" },
-];
+ *  que oficina tiene su propia sección real.
+ *
+ *  Título de cada sección: ya NO es un campo propio acá -- se deriva de
+ *  ESTILO_LABEL (recommend.ts). Antes tenía su propia copia ("Clásico",
+ *  "Urbano"), el mismo patrón de duplicación que ya causó el bug de
+ *  arriba (una lista desincronizada del resto de la app); se sacó al
+ *  renombrar esos dos estilos a "Smart Casual"/"Streetwear" (Consejo,
+ *  auditoría de nombres vs. contenido real del placard) para que una
+ *  futura renombrada solo tenga que tocar ESTILO_LABEL una vez. */
+const SECCIONES: Estilo[] = ["formal", "oficina", "clasico", "urbano", "casual", "deportivo"];
 
 /** Buscador + filtro por estilo + catálogo agrupado en secciones -- un solo
  *  componente compartido por PrendaForm.tsx ("+Prenda") y Probar.tsx
@@ -128,14 +130,14 @@ export default function CatalogoPicker({
         >
           Todos
         </button>
-        {SECCIONES.map(({ estilo, titulo }) => (
+        {SECCIONES.map((estilo) => (
           <button
             key={estilo}
             type="button"
             className={`chip${filtroEstilo === estilo ? " chip-activo" : ""}`}
             onClick={() => setFiltroEstilo((prev) => (prev === estilo ? null : estilo))}
           >
-            {titulo}
+            {ESTILO_LABEL[estilo]}
           </button>
         ))}
       </div>
@@ -146,10 +148,10 @@ export default function CatalogoPicker({
         </p>
       ) : (
         <div className="catalogo-secciones" style={{ maxHeight }}>
-          {SECCIONES.filter(({ estilo }) => grupos.has(estilo)).map(({ estilo, titulo }) => (
+          {SECCIONES.filter((estilo) => grupos.has(estilo)).map((estilo) => (
             <div key={estilo}>
               <p className="catalogo-seccion-titulo">
-                {titulo} <span className="catalogo-seccion-count">({grupos.get(estilo)!.length})</span>
+                {ESTILO_LABEL[estilo]} <span className="catalogo-seccion-count">({grupos.get(estilo)!.length})</span>
               </p>
               <div className="catalogo-grid">{grupos.get(estilo)!.map(tarjeta)}</div>
             </div>
